@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>全体会議プラットフォーム</title>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 <style>
 :root {
   --primary: #2563eb;
@@ -347,29 +349,55 @@ function createSampleData() {
   return {settings:{orgName:'',meetingCycle:2},committees,members:[],agendas,meetings,minutes:{},todos};
 }
 
-// ===== Data Store =====
-const SK='meetingPlatformV5'; let data;
-// 起動時に古いデータを全てクリア
-try{localStorage.removeItem('meetingPlatformV2');localStorage.removeItem('meetingPlatformV3');localStorage.removeItem('meetingPlatformV4');}catch(e){}
-function loadData(){
+// ===== Firebase Setup =====
+const firebaseConfig={apiKey:"AIzaSyCQdn4_EB8RHw9H5S4glRHRTYcOJCUnNss",authDomain:"meeting-platform-9175e.firebaseapp.com",databaseURL:"https://meeting-platform-9175e-default-rtdb.firebaseio.com",projectId:"meeting-platform-9175e",storageBucket:"meeting-platform-9175e.firebasestorage.app",messagingSenderId:"351017496281",appId:"1:351017496281:web:8ef6ebb0229b5e91cf18c8"};
+firebase.initializeApp(firebaseConfig);
+const dbRef=firebase.database().ref('meetingPlatform');
+let data;let _saving=false;let _initialized=false;
+
+// ===== Data Store (Firebase + localStorage fallback) =====
+const SK='meetingPlatformV5';
+function ensureDefaults(){
   const sample=createSampleData();
-  try{
-    const s=localStorage.getItem(SK);
-    if(s){data=JSON.parse(s);}else{data=sample;}
-  }catch(e){data=sample;}
-  // 委員会データは常にデフォルトで上書き
   data.committees=sample.committees;
   if(!data.members)data.members=[];
   if(!data.agendas)data.agendas=sample.agendas;
   if(!data.meetings)data.meetings=sample.meetings;
   if(!data.todos)data.todos=sample.todos;
   if(!data.settings)data.settings=sample.settings;
+  if(!data.minutes)data.minutes={};
+}
+async function loadData(){
+  const sample=createSampleData();
+  try{
+    const snap=await dbRef.once('value');
+    const val=snap.val();
+    if(val){data=val;}
+    else{
+      try{const s=localStorage.getItem(SK);if(s){data=JSON.parse(s);}else{data=sample;}}catch(e){data=sample;}
+    }
+  }catch(e){
+    try{const s=localStorage.getItem(SK);if(s){data=JSON.parse(s);}else{data=sample;}}catch(e2){data=sample;}
+  }
+  ensureDefaults();
   saveData();
 }
-function saveData(){try{localStorage.setItem(SK,JSON.stringify(data));}catch(e){}}
-function exportData(){const b=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);const d=new Date();a.download=`meeting-backup-${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}.json`;a.click();}
-function importData(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=function(ev){try{if(confirm('現在のデータを上書きしますか？')){data=JSON.parse(ev.target.result);saveData();location.reload();}}catch(err){alert('読み込み失敗');}};r.readAsText(f);e.target.value='';}
-function resetToSample(){if(confirm('サンプルデータ（2月全体会議）に戻しますか？')){data=createSampleData();saveData();location.reload();}}
+function saveData(){
+  _saving=true;
+  try{localStorage.setItem(SK,JSON.stringify(data));}catch(e){}
+  try{dbRef.set(data).then(()=>{_saving=false;}).catch(()=>{_saving=false;});}catch(e){_saving=false;}
+}
+dbRef.on('value',snap=>{
+  if(_saving||!_initialized)return;
+  const val=snap.val();
+  if(val){data=val;ensureDefaults();refreshCurrentPage();}
+});
+function refreshCurrentPage(){
+  const active=document.querySelector('.page.active');
+  if(!active)return;
+  const id=active.id.replace('page-','');
+  ({dashboard:renderDashboard,agenda:()=>{populateAgendaSelects();renderAgendas();},committees:renderCommittees,meetings:renderMeetings,minutes:populateMinutesMeetingSelect,history:renderHistory,todos:renderTodos,members:renderMembers,settings:loadSettings})[id]?.();
+}
 
 // ===== Nav =====
 function showPage(p,el){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.getElementById('page-'+p).classList.add('active');document.querySelectorAll('.sidebar-item').forEach(s=>s.classList.remove('active'));if(el)el.classList.add('active');({dashboard:renderDashboard,agenda:()=>{populateAgendaSelects();renderAgendas();},committees:renderCommittees,meetings:renderMeetings,minutes:populateMinutesMeetingSelect,history:renderHistory,todos:renderTodos,members:renderMembers,settings:loadSettings})[p]?.();}
@@ -443,8 +471,12 @@ function saveSettings(){data.settings.orgName=document.getElementById('orgName')
 function exportData(){const json=JSON.stringify(data,null,2);const blob=new Blob([json],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='meeting-data-export.json';a.click();URL.revokeObjectURL(a.href);alert('エクスポートが完了しました。保存先を「社内会議用資料」フォルダに指定してください。');}
 
 // ===== Init =====
-loadData();renderDashboard();
-document.querySelectorAll('.modal-overlay').forEach(o=>{o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('show');});});
+(async function(){
+  await loadData();
+  _initialized=true;
+  renderDashboard();
+  document.querySelectorAll('.modal-overlay').forEach(o=>{o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('show');});});
+})();
 </script>
 </body>
 </html>
