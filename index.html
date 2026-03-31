@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>全体会議プラットフォーム</title>
+<style>
+:root {
+  --primary: #2563eb;
+  --primary-light: #dbeafe;
+  --primary-dark: #1d4ed8;
+  --success: #16a34a;
+  --warning: #f59e0b;
+  --danger: #dc2626;
+  --gray-50: #f9fafb;
+  --gray-100: #f3f4f6;
+  --gray-200: #e5e7eb;
+  --gray-300: #d1d5db;
+  --gray-400: #9ca3af;
+  --gray-500: #6b7280;
+  --gray-600: #4b5563;
+  --gray-700: #374151;
+  --gray-800: #1f2937;
+  --gray-900: #111827;
+  --radius: 8px;
+  --shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif; background: var(--gray-50); color: var(--gray-800); line-height: 1.6; }
+
+.header { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: #fff; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; box-shadow: var(--shadow-lg); position: sticky; top: 0; z-index: 100; }
+.header h1 { font-size: 20px; font-weight: 700; letter-spacing: 0.5px; }
+.header-right { display: flex; gap: 12px; align-items: center; }
+.header-btn { background: rgba(255,255,255,0.15); color: #fff; border: 1px solid rgba(255,255,255,0.3); padding: 6px 14px; border-radius: var(--radius); cursor: pointer; font-size: 13px; transition: all 0.2s; }
+.header-btn:hover { background: rgba(255,255,255,0.25); }
+
+.app { display: flex; min-height: calc(100vh - 56px); }
+.sidebar { width: 220px; background: #fff; border-right: 1px solid var(--gray-200); padding: 16px 0; flex-shrink: 0; }
+.sidebar-item { display: flex; align-items: center; gap: 10px; padding: 10px 20px; cursor: pointer; font-size: 14px; color: var(--gray-600); transition: all 0.15s; border-left: 3px solid transparent; }
+.sidebar-item:hover { background: var(--gray-50); color: var(--gray-800); }
+.sidebar-item.active { background: var(--primary-light); color: var(--primary); border-left-color: var(--primary); font-weight: 600; }
+.sidebar-item .icon { font-size: 18px; width: 24px; text-align: center; }
+.sidebar-section { font-size: 11px; text-transform: uppercase; color: var(--gray-400); padding: 16px 20px 6px; font-weight: 600; letter-spacing: 1px; }
+.main { flex: 1; padding: 24px 32px; max-width: 1200px; overflow-y: auto; }
+.main h2 { font-size: 22px; font-weight: 700; margin-bottom: 20px; color: var(--gray-900); }
+
+.card { background: #fff; border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px; margin-bottom: 16px; border: 1px solid var(--gray-100); }
+.card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.card-title { font-size: 16px; font-weight: 600; color: var(--gray-800); }
+
+.btn { padding: 8px 16px; border-radius: var(--radius); border: none; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.15s; display: inline-flex; align-items: center; gap: 6px; }
+.btn-primary { background: var(--primary); color: #fff; }
+.btn-primary:hover { background: var(--primary-dark); }
+.btn-success { background: var(--success); color: #fff; }
+.btn-success:hover { background: #15803d; }
+.btn-danger { background: var(--danger); color: #fff; }
+.btn-danger:hover { background: #b91c1c; }
+.btn-outline { background: #fff; color: var(--gray-600); border: 1px solid var(--gray-300); }
+.btn-outline:hover { background: var(--gray-50); border-color: var(--gray-400); }
+.btn-sm { padding: 4px 10px; font-size: 12px; }
+.btn-warning { background: var(--warning); color: #fff; }
+
+input, select, textarea { width: 100%; padding: 8px 12px; border: 1px solid var(--gray-300); border-radius: var(--radius); font-size: 14px; font-family: inherit; transition: border-color 0.15s; }
+input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+textarea { resize: vertical; min-height: 80px; }
+label { display: block; font-size: 13px; font-weight: 500; color: var(--gray-700); margin-bottom: 4px; }
+.form-group { margin-bottom: 14px; }
+.form-row { display: flex; gap: 12px; }
+.form-row > * { flex: 1; }
+
+.badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+.badge-blue { background: var(--primary-light); color: var(--primary); }
+.badge-green { background: #dcfce7; color: var(--success); }
+.badge-yellow { background: #fef3c7; color: #b45309; }
+.badge-red { background: #fee2e2; color: var(--danger); }
+.badge-gray { background: var(--gray-100); color: var(--gray-500); }
+
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--gray-200); }
+th { background: var(--gray-50); font-weight: 600; color: var(--gray-600); font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+tr:hover { background: var(--gray-50); }
+
+.tabs { display: flex; gap: 0; border-bottom: 2px solid var(--gray-200); margin-bottom: 20px; }
+.tab { padding: 10px 20px; cursor: pointer; font-size: 14px; color: var(--gray-500); border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.15s; }
+.tab:hover { color: var(--gray-700); }
+.tab.active { color: var(--primary); border-bottom-color: var(--primary); font-weight: 600; }
+
+.modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); z-index: 200; justify-content: center; align-items: center; }
+.modal-overlay.show { display: flex; }
+.modal { background: #fff; border-radius: 12px; padding: 24px; width: 90%; max-width: 650px; max-height: 85vh; overflow-y: auto; box-shadow: var(--shadow-lg); }
+.modal h3 { font-size: 18px; font-weight: 700; margin-bottom: 16px; }
+.modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; }
+
+.timeline { position: relative; padding-left: 28px; }
+.timeline::before { content: ''; position: absolute; left: 8px; top: 0; bottom: 0; width: 2px; background: var(--gray-200); }
+.timeline-item { position: relative; margin-bottom: 24px; }
+.timeline-item::before { content: ''; position: absolute; left: -24px; top: 4px; width: 12px; height: 12px; border-radius: 50%; background: var(--primary); border: 2px solid #fff; box-shadow: 0 0 0 2px var(--primary); }
+.timeline-date { font-size: 13px; color: var(--gray-500); font-weight: 600; margin-bottom: 6px; }
+.timeline-content { background: #fff; border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 14px; }
+
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+.stat-card { background: #fff; border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow); border: 1px solid var(--gray-100); }
+.stat-value { font-size: 28px; font-weight: 700; color: var(--gray-900); }
+.stat-label { font-size: 13px; color: var(--gray-500); margin-top: 2px; }
+
+.committee-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 6px; vertical-align: middle; }
+
+.empty-state { text-align: center; padding: 40px 20px; color: var(--gray-400); }
+.empty-state .icon { font-size: 48px; margin-bottom: 12px; }
+
+.todo-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-bottom: 1px solid var(--gray-100); }
+.todo-item:last-child { border-bottom: none; }
+.todo-checkbox { width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary); flex-shrink: 0; }
+.todo-text { flex: 1; font-size: 14px; }
+.todo-text.done { text-decoration: line-through; color: var(--gray-400); }
+.todo-meta { font-size: 12px; color: var(--gray-400); display: flex; gap: 8px; flex-wrap: wrap; }
+
+.tag { display: inline-block; padding: 2px 8px; background: var(--gray-100); border-radius: 4px; font-size: 12px; color: var(--gray-600); margin: 2px; }
+
+.committee-card { border-left: 4px solid; padding: 16px; margin-bottom: 12px; background: #fff; border-radius: var(--radius); box-shadow: var(--shadow); }
+.committee-card h4 { margin-bottom: 8px; }
+
+.minutes-agenda-card { border-left: 3px solid var(--gray-300); padding: 14px; margin-bottom: 12px; background: var(--gray-50); border-radius: var(--radius); }
+
+@media (max-width: 768px) {
+  .sidebar { display: none; }
+  .main { padding: 16px; }
+  .form-row { flex-direction: column; }
+  .stats-grid { grid-template-columns: 1fr 1fr; }
+  .dashboard-grid { grid-template-columns: 1fr !important; }
+}
+@media print { .sidebar, .header, .btn, .modal-overlay { display: none !important; } .main { max-width: 100%; padding: 0; } }
+.page { display: none; }
+.page.active { display: block; }
+.dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>📋 全体会議プラットフォーム <span style="font-size:11px;opacity:0.6">v5</span></h1>
+  <div class="header-right">
+    <button class="header-btn" onclick="exportData()">💾 データ書き出し</button>
+    <button class="header-btn" onclick="document.getElementById('importFile').click()">📂 データ読み込み</button>
+    <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+  </div>
+</div>
+
+<div class="app">
+  <nav class="sidebar">
+    <div class="sidebar-section">メニュー</div>
+    <div class="sidebar-item active" onclick="showPage('dashboard',this)"><span class="icon">🏠</span> ダッシュボード</div>
+    <div class="sidebar-item" onclick="showPage('committees',this)"><span class="icon">🏛️</span> 委員会管理</div>
+    <div class="sidebar-item" onclick="showPage('agenda',this)"><span class="icon">📝</span> 議題投稿</div>
+    <div class="sidebar-item" onclick="showPage('meetings',this)"><span class="icon">🗓️</span> 会議一覧</div>
+    <div class="sidebar-item" onclick="showPage('minutes',this)"><span class="icon">📄</span> 議事録</div>
+    <div class="sidebar-item" onclick="showPage('history',this)"><span class="icon">📊</span> 過去の流れ</div>
+    <div class="sidebar-item" onclick="showPage('todos',this)"><span class="icon">✅</span> ToDoリスト</div>
+    <div class="sidebar-section">設定</div>
+    <div class="sidebar-item" onclick="showPage('members',this)"><span class="icon">👥</span> メンバー管理</div>
+    <div class="sidebar-item" onclick="showPage('settings',this)"><span class="icon">⚙️</span> 設定</div>
+  </nav>
+
+  <div class="main">
+    <div class="page active" id="page-dashboard">
+      <h2>ダッシュボード</h2>
+      <div class="stats-grid" id="dashboardStats"></div>
+      <div class="dashboard-grid">
+        <div class="card"><div class="card-header"><span class="card-title">直近の議題（未討議）</span></div><div id="recentAgendas"></div></div>
+        <div class="card"><div class="card-header"><span class="card-title">未完了のToDo</span></div><div id="recentTodos"></div></div>
+      </div>
+    </div>
+
+    <div class="page" id="page-committees">
+      <h2>委員会管理</h2>
+      <div class="card"><div class="card-header"><span class="card-title">委員会一覧</span><button class="btn btn-primary" onclick="openModal('committeeModal')">＋ 追加</button></div><div id="committeeList"></div></div>
+    </div>
+
+    <div class="page" id="page-agenda">
+      <h2>議題投稿</h2>
+      <div class="card">
+        <div class="card-header"><span class="card-title">新しい議題を投稿</span></div>
+        <div class="form-row">
+          <div class="form-group"><label>委員会</label><select id="agendaCommittee"></select></div>
+          <div class="form-group"><label>分類</label><select id="agendaCategory"><option value="提案">提案</option><option value="お伺い">お伺い</option><option value="報告">報告</option><option value="お願い">お願い</option><option value="購入希望">購入希望</option><option value="その他">その他</option></select></div>
+          <div class="form-group"><label>優先度</label><select id="agendaPriority"><option value="high">高</option><option value="medium" selected>中</option><option value="low">低</option></select></div>
+        </div>
+        <div class="form-group"><label>議題タイトル</label><input type="text" id="agendaTitle" placeholder="例: 尿検査後の検体の管理について"></div>
+        <div class="form-group"><label>詳細説明</label><textarea id="agendaDetail" rows="4" placeholder="議題の背景や討論ポイントを記入"></textarea></div>
+        <div class="form-row"><div class="form-group"><label>投稿者</label><select id="agendaAuthor"><option value="">選択してください</option></select></div><div class="form-group"><label>対象会議</label><select id="agendaTargetMeeting"><option value="">未定</option></select></div></div>
+        <div class="form-group"><label>画像添付（任意）</label><input type="file" id="agendaImage" accept="image/*" multiple onchange="previewAgendaImages(this)" style="font-size:13px"><div id="agendaImagePreview" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px"></div><p style="font-size:11px;color:var(--gray-400);margin-top:4px">※ 画像は自動で圧縮されます（1枚あたり最大300KB程度）</p></div>
+        <button class="btn btn-primary" onclick="addAgenda()">投稿する</button>
+      </div>
+      <div class="card" style="margin-top:16px">
+        <div class="card-header">
+          <span class="card-title">投稿済み議題</span>
+          <div style="display:flex;gap:8px">
+            <select id="agendaFilterCommittee" onchange="renderAgendas()" style="width:auto;padding:4px 8px;font-size:13px"><option value="all">全委員会</option></select>
+            <select id="agendaFilter" onchange="renderAgendas()" style="width:auto;padding:4px 8px;font-size:13px"><option value="all">すべて</option><option value="pending">未討議</option><option value="discussed">討議済み</option></select>
+          </div>
+        </div>
+        <div id="agendaList"></div>
+      </div>
+    </div>
+
+    <div class="page" id="page-meetings">
+      <h2>会議一覧</h2>
+      <div class="card"><div class="card-header"><span class="card-title">会議スケジュール</span><button class="btn btn-primary" onclick="openModal('meetingModal')">＋ 新規会議</button></div><div id="meetingList"></div></div>
+    </div>
+
+    <div class="page" id="page-minutes">
+      <h2>議事録</h2>
+      <div class="card">
+        <div class="card-header"><span class="card-title">会議を選択して議事録を記録</span></div>
+        <select id="minutesMeetingSelect" onchange="loadMinutes()" style="margin-bottom:16px"></select>
+        <div id="minutesEditor" style="display:none">
+          <div class="form-group"><label>出席者</label><div id="minutesAttendees" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px"></div></div>
+          <h4 style="margin:16px 0 8px;color:var(--gray-700)">各議題の討議内容</h4>
+          <div id="minutesAgendaItems"></div>
+          <div class="form-group" style="margin-top:16px"><label>全体メモ・決定事項</label><textarea id="minutesGeneralNotes" rows="4" placeholder="全体的なメモや決定事項を記入"></textarea></div>
+          <div style="display:flex;gap:8px"><button class="btn btn-success" onclick="saveMinutes()">💾 議事録を保存</button><button class="btn btn-outline" onclick="window.print()">🖨️ 印刷用表示</button></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="page" id="page-history">
+      <h2>過去の会議まとめ</h2>
+      <div class="card">
+        <div style="display:flex;gap:12px;margin-bottom:16px">
+          <div class="form-group" style="flex:1;margin-bottom:0"><label>委員会フィルター</label><select id="historyFilter" onchange="renderHistory()"><option value="all">すべての委員会</option></select></div>
+          <div class="form-group" style="flex:1;margin-bottom:0"><label>表示形式</label><select id="historyView" onchange="renderHistory()"><option value="timeline">タイムライン（時系列）</option><option value="committee">委員会別まとめ</option></select></div>
+        </div>
+        <div id="historyContent"></div>
+      </div>
+    </div>
+
+    <div class="page" id="page-todos">
+      <h2>ToDoリスト</h2>
+      <div class="card">
+        <div class="card-header"><span class="card-title">タスク管理</span><button class="btn btn-primary" onclick="openModal('todoModal')">＋ 追加</button></div>
+        <div class="tabs">
+          <div class="tab active" onclick="filterTodos('all',this)">すべて</div>
+          <div class="tab" onclick="filterTodos('pending',this)">未完了</div>
+          <div class="tab" onclick="filterTodos('done',this)">完了</div>
+          <div class="tab" onclick="filterTodos('overdue',this)">期限超過</div>
+        </div>
+        <div id="todoList"></div>
+      </div>
+    </div>
+
+    <div class="page" id="page-members">
+      <h2>メンバー管理</h2>
+      <div class="card"><div class="card-header"><span class="card-title">メンバー一覧</span><button class="btn btn-primary" onclick="openModal('memberModal')">＋ 追加</button></div><div id="memberList"></div></div>
+    </div>
+
+    <div class="page" id="page-settings">
+      <h2>設定</h2>
+      <div class="card"><div class="card-title" style="margin-bottom:12px">病院名</div><div class="form-group"><input type="text" id="orgName" placeholder="例: ○○動物病院" onchange="saveSettings()"></div></div>
+      <div class="card"><div class="card-title" style="margin-bottom:12px">会議サイクル</div><div class="form-group"><select id="meetingCycle" onchange="saveSettings()"><option value="1">毎月</option><option value="2" selected>2ヶ月ごと</option><option value="3">3ヶ月ごと</option></select></div></div>
+      <div class="card"><div class="card-title" style="margin-bottom:12px">データ管理</div><p style="font-size:14px;color:var(--gray-500);margin-bottom:12px">データはブラウザのローカルストレージに保存されます。定期的にバックアップを取ることをおすすめします。</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-outline" onclick="exportData()">💾 JSONで書き出し</button>
+          <button class="btn btn-warning" onclick="resetToSample()">🔄 サンプルデータに戻す</button>
+          <button class="btn btn-danger" onclick="if(confirm('すべてのデータを削除しますか？')){localStorage.removeItem('meetingPlatformV2');location.reload();}">🗑️ 全データ削除</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modals -->
+<div class="modal-overlay" id="committeeModal"><div class="modal"><h3>委員会を追加</h3><div class="form-group"><label>委員会名</label><input type="text" id="committeeName" placeholder="例: 医療安全委員会"></div><div class="form-group"><label>カラー</label><input type="color" id="committeeColor" value="#2563eb" style="width:60px;height:36px;padding:2px"></div><div class="form-group"><label>説明（任意）</label><textarea id="committeeDesc" rows="2" placeholder="委員会の目的や担当範囲"></textarea></div><div class="modal-actions"><button class="btn btn-outline" onclick="closeModal('committeeModal')">キャンセル</button><button class="btn btn-primary" onclick="addCommittee()">追加</button></div></div></div>
+
+<div class="modal-overlay" id="meetingModal"><div class="modal"><h3>新規会議を作成</h3><div class="form-group"><label>会議名</label><input type="text" id="meetingName" placeholder="例: 4月 全体会議"></div><div class="form-group"><label>日付</label><input type="date" id="meetingDate" max="9999-12-31" min="2020-01-01"></div><div class="form-row"><div class="form-group"><label>開始時間</label><input type="time" id="meetingStart" value="14:00"></div><div class="form-group"><label>終了時間</label><input type="time" id="meetingEnd" value="16:00"></div></div><div class="form-group"><label>場所</label><input type="text" id="meetingPlace" placeholder="例: 会議室"></div><div class="form-group"><label>この会議に含める議題</label><div id="meetingAgendaSelect" style="max-height:200px;overflow-y:auto"></div></div><div class="modal-actions"><button class="btn btn-outline" onclick="closeModal('meetingModal')">キャンセル</button><button class="btn btn-primary" onclick="addMeeting()">作成</button></div></div></div>
+
+<div class="modal-overlay" id="todoModal"><div class="modal"><h3>ToDoを追加</h3><div class="form-group"><label>タスク内容</label><input type="text" id="todoContent" placeholder="例: 猫用カラーを試験購入する"></div><div class="form-row"><div class="form-group"><label>担当者</label><select id="todoAssignee"></select></div><div class="form-group"><label>期限</label><input type="date" id="todoDueDate" max="9999-12-31" min="2020-01-01"></div></div><div class="form-row"><div class="form-group"><label>関連委員会</label><select id="todoCommittee"><option value="">なし</option></select></div><div class="form-group"><label>優先度</label><select id="todoPriority"><option value="high">高</option><option value="medium" selected>中</option><option value="low">低</option></select></div></div><div class="modal-actions"><button class="btn btn-outline" onclick="closeModal('todoModal')">キャンセル</button><button class="btn btn-primary" onclick="addTodo()">追加</button></div></div></div>
+
+<div class="modal-overlay" id="memberModal"><div class="modal"><h3 id="memberModalTitle">メンバーを追加</h3><input type="hidden" id="memberEditId" value=""><div class="form-group"><label>名前</label><input type="text" id="memberName" placeholder="例: 山田太郎"></div><div class="form-group"><label>役職</label><select id="memberRole"><option value="獣医師">獣医師(VET)</option><option value="動物看護師">動物看護師(VT)</option><option value="受付">受付</option><option value="その他">その他</option></select></div><div class="form-group"><label>所属委員会</label><div id="memberCommitteeSelect" style="max-height:200px;overflow-y:auto"></div></div><div class="modal-actions"><button class="btn btn-outline" onclick="closeModal('memberModal')">キャンセル</button><button class="btn btn-primary" id="memberSubmitBtn" onclick="saveMember()">追加</button></div></div></div>
+
+<div class="modal-overlay" id="agendaDetailModal"><div class="modal"><h3 id="agendaDetailTitle"></h3><div id="agendaDetailContent"></div><div class="modal-actions"><button class="btn btn-outline" onclick="closeModal('agendaDetailModal')">閉じる</button></div></div></div>
+
+<script>
+// ===== SAMPLE DATA from 2月全体会議 =====
+function createSampleData() {
+  const committees = [
+    { id:'c3', name:'受付委員会', color:'#0891b2', desc:'アーミックス運用・受付業務' },
+    { id:'c1', name:'看護委員会', color:'#e11d48', desc:'看護業務全般の改善・提案' },
+    { id:'c9', name:'診療委員会', color:'#4f46e5', desc:'診療関連の提案・報告' },
+    { id:'c2', name:'VRV委員会', color:'#7c3aed', desc:'院内マナー・職場環境の向上' },
+    { id:'c4', name:'スキルアップ・飾り付け委員会', color:'#ea580c', desc:'セミナー企画・院内装飾' },
+    { id:'c5', name:'5S委員会', color:'#16a34a', desc:'整理・整頓・清掃・清潔・しつけ' },
+    { id:'c6', name:'スケジュール・イベント委員会', color:'#2563eb', desc:'シフト管理・イベント企画' },
+    { id:'c7', name:'新しい風委員会', color:'#db2777', desc:'新しい取り組み・改善提案' },
+    { id:'c8', name:'在庫委員会', color:'#ca8a04', desc:'在庫管理・発注システム' }
+  ];
+  const agendas = [
+    {id:'a1',title:'尿検査後の検体の管理',detail:'検査後乱雑に置かれていることがあるため\n担当VETは検査前後で廃棄OKかの判断→必要なければ検査後すぐ廃棄\n※残す必要ある場合→シリンジに取って保管（名前記入）、ウロキャッチャー等はすぐ廃棄\n使い捨ての容器で一時保管',committeeId:'c1',priority:'high',status:'discussed',category:'提案',createdAt:'2026-02-20T10:00:00'},
+    {id:'a2',title:'再滅菌の際に滅菌バックに滅菌日の記載',detail:'かなり前から再滅菌して置いてある物がある\n・記入タイミング：滅菌直前（VET）保管場所に戻す際（基本VT）\n・記入場所：切り取る側のできるだけ端',committeeId:'c1',priority:'medium',status:'discussed',category:'提案',createdAt:'2026-02-20T10:00:00'},
+    {id:'a3',title:'アーミックス導入以降の初診問診票（Re時も必要か）',detail:'Re時も出していただいているが必要でしょうか？',committeeId:'c1',priority:'medium',status:'discussed',category:'お伺い',createdAt:'2026-02-20T10:00:00'},
+    {id:'a4',title:'VACチェック時の遅延性アレルギー症状の提示',detail:'VET：VAC打つ前に口頭お伝えのみの先生もおられるため\n必ず提示（お呼びするときに準備しておく）＋遅延アレルギー症状の部分を色付け',committeeId:'c1',priority:'high',status:'discussed',category:'お願い',createdAt:'2026-02-20T10:00:00'},
+    {id:'a5',title:'入院の引き継ぎに関して',detail:'・担当VETが休みに入る際、担当の子の引き継ぎVETを決め担当VTに伝えていただきたい\n・引き継ぎのVETは9:30でいらっしゃらないのか？（以前9:30と決めていただいていたはず）',committeeId:'c1',priority:'high',status:'discussed',category:'お願い',createdAt:'2026-02-20T10:00:00'},
+    {id:'a6',title:'フード・薬のみ：受付ツリー名前前の日付徹底',detail:'現状日付がなかったり、注文を受けた日になっており確認が重なるため\n取りにくる前TEL・未定の場合→未定ボックスを作成 or 備考欄に記載\n\n【お願い】薬のみHopeの時：何のお薬・トータル何種類か確認を',committeeId:'c1',priority:'medium',status:'discussed',category:'お願い',createdAt:'2026-02-20T10:00:00'},
+    {id:'a7',title:'購入希望：院内保定用 猫用カラー×1',detail:'メリット：着脱時の音が最低限\nデメリット：ガムテープなどで補強が必要な場合がある\nまず1つで試してみる',committeeId:'c1',priority:'low',status:'discussed',category:'購入希望',createdAt:'2026-02-20T10:00:00'},
+    {id:'a8',title:'購入希望：乳鉢1セット ¥1,296（税込）',detail:'',committeeId:'c1',priority:'low',status:'discussed',category:'購入希望',createdAt:'2026-02-20T10:00:00'},
+    {id:'a9',title:'トイレの水・電気の使用状況（前回フォロー）',detail:'・トイレの水→回数はかなり減ったが2回程見かけている、電気のつけっぱなしが増えた\n・給水器の交換→3回程決まったラインより減ったまま放置されていた\n\n※院内で皆さんが気持ちよく過ごせるように決めていることです',committeeId:'c2',priority:'medium',status:'discussed',category:'報告',createdAt:'2026-02-20T10:00:00'},
+    {id:'a10',title:'アンケート：新人さんの成長したところ',detail:'・岸上さん→手術の効率化、状況判断が早くなった\n・杉浦さん→笑顔が増えた、要領よく動いている\n・峯さん→状態変化・薬容量の違いに気づく、対応が丁寧\n・岡村さん→自信を持ってオーナー様対応、積極的に行動\n・井上さん→任せられる時間が増えた、さっと行動してくれる\n・北さん→会計を先輩チェックなしで、寄り添った対応',committeeId:'c2',priority:'low',status:'discussed',category:'報告',createdAt:'2026-02-20T10:00:00'},
+    {id:'a11',title:'予防薬処方時の備考欄に予防期間を記載',detail:'アニレセ同様次回予定日を設定する必要があり、ハガキを送る際の範囲が変わってくるため',committeeId:'c3',priority:'high',status:'discussed',category:'お願い',createdAt:'2026-02-20T10:00:00'},
+    {id:'a12',title:'評価ノートの記載ルール統一',detail:'保険の症状として載せるものを「一行目」\nメモとして載せるものを「一行空けて二行目以降」で統一\nアニコム保険加入者は発症日の入力も必要なため日付の記載もお願い',committeeId:'c3',priority:'high',status:'discussed',category:'お願い',createdAt:'2026-02-20T10:00:00'},
+    {id:'a13',title:'会計待ち移動時の明細データ保留徹底',detail:'先に会計okとお伝えがあったが、明細が保留に挙がっていない・入力途中・保留忘れ等が度々見受けられたため',committeeId:'c3',priority:'medium',status:'discussed',category:'お願い',createdAt:'2026-02-20T10:00:00'},
+    {id:'a14',title:'診察時予約のEPARK反映',detail:'TELやWeb・LINE等で受付に回ってくるまでに予約が埋まってしまう可能性があるため',committeeId:'c3',priority:'medium',status:'discussed',category:'お願い',createdAt:'2026-02-20T10:00:00'},
+    {id:'a15',title:'紙カルテの廃止について',detail:'カルテファイルがない→初回のみ、以降は必要な時に出す\nカルテファイルがある→おまとめの時期が終わる3月まで or 予防の多い6月ごろまで',committeeId:'c3',priority:'high',status:'discussed',category:'お伺い',createdAt:'2026-02-20T10:00:00'},
+    {id:'a16',title:'ヒヤリハット・イレギュラー死亡患者報告の継続',detail:'昨年度から行っていた報告→継続していく',committeeId:'c4',priority:'medium',status:'discussed',category:'報告',createdAt:'2026-02-20T10:00:00'},
+    {id:'a17',title:'フィラリア・ノミマダニ・SFTSセミナーの実施',detail:'フィラリア、ノミマダニ約1時間、SFTS約30分（時間調整可能）\n→主に獣医師・看護師対象、実施は平日のみ',committeeId:'c4',priority:'medium',status:'discussed',category:'提案',createdAt:'2026-02-20T10:00:00'},
+    {id:'a18',title:'3月初旬 春の飾り付け',detail:'日程は決まり次第連絡、ご協力お願いいたします',committeeId:'c4',priority:'low',status:'discussed',category:'報告',createdAt:'2026-02-20T10:00:00'},
+    {id:'a19',title:'週清掃・大掃除・月1掃除の日の運営',detail:'【週清掃】今年も継続\n【年2回の大掃除】6/4(木)14:00〜15:00、12月は未定\n【月1回の掃除の日】毎月1日、空いている時間に\n※6月、12月、1月は大掃除があるためなし',committeeId:'c5',priority:'medium',status:'discussed',category:'報告',createdAt:'2026-02-20T10:00:00'},
+    {id:'a20',title:'処置室ワゴンの整理（定位置決め・テプラ貼付）',detail:'爪切りやピンセットなど乱雑に入っている、戻す位置がわからないなど意見が上がった\n順次テプラを貼りますので決められた位置に戻してください',committeeId:'c5',priority:'medium',status:'discussed',category:'お願い',createdAt:'2026-02-20T10:00:00'},
+    {id:'a21',title:'スケジュール連絡（希望休・有給・診察日）',detail:'・希望休 2/28までに4月分、3/31までに5月分\n・有給届 3/15までに4月分、4/15までに5月分→村田さんへ\n・辻先生診察日 3/25(水)、4/29(水)\n・皮膚科 3/9下浦先生、4/13神田先生\n・腫瘍科 毎週月曜（第1週のみ金曜）\n・岡本先生セミナー 3/2、4/27 13:00〜',committeeId:'c6',priority:'high',status:'discussed',category:'報告',createdAt:'2026-02-20T10:00:00'},
+    {id:'a22',title:'イベント予定（新人歓迎会BBQ・スポーツ大会）',detail:'春頃に新人歓迎会(BBQ)、秋頃にスポーツ大会を予定\n詳細決まり次第連絡、後日アンケートあり',committeeId:'c6',priority:'low',status:'discussed',category:'報告',createdAt:'2026-02-20T10:00:00'},
+    {id:'a23',title:'献血協力者へのお礼の充実',detail:'現状→登録時 ペットタオル、協力時 CBC/Chem10測定＋ワクチンチケット\n充実案：年間予防薬お渡し、PETDOC無料 等',committeeId:'c7',priority:'medium',status:'discussed',category:'提案',createdAt:'2026-02-20T10:00:00'},
+    {id:'a24',title:'LINEリッチメニュー・返信時間短縮',detail:'・リッチメニュー：お薬お渡し時間、出勤カレンダー、インスタ、YouTube\n・LINE返信時間短縮：ピン留めタイミングを変更\n現状→来たらとりあえずピン留め→対応中かもと後回し\n今後→対応するときにピン留め',committeeId:'c7',priority:'high',status:'discussed',category:'提案',createdAt:'2026-02-20T10:00:00'},
+    {id:'a25',title:'紙カルテ廃止に向けた移行計画',detail:'アーミックス導入から3ヶ月、受付の手間が増えている\n・導入以降の初診カルテ→すぐやめる（ただし初診問診票2枚目のスキャン問題あり）\n・導入前のカルテ→まとめ買い終了時（半年後）or 導入後1年\n最終目標：各業務を完結でき、飼い主様をお待たせしないこと',committeeId:'c7',priority:'high',status:'discussed',category:'提案',createdAt:'2026-02-20T10:00:00'},
+    {id:'a26',title:'今年の目標：病院の支出を減らす',detail:'・余剰在庫を減らす在庫数の見直し\n・pittoの最大限活用\n・予防薬の種類を絞る（2027年よりシンパリカトリオメイン）',committeeId:'c8',priority:'high',status:'discussed',category:'報告',createdAt:'2026-02-20T10:00:00'},
+    {id:'a27',title:'サージロン・バイオシン使用期限切れの処分',detail:'オペ室に長期間保管＋使用期限がかなり切れている\n→2月いっぱいまで保管、3/1残分は全て破棄',committeeId:'c8',priority:'medium',status:'discussed',category:'報告',createdAt:'2026-02-20T10:00:00'},
+    {id:'a28',title:'注文方法の変更（QRコード→バインダー）',detail:'●今後→QRコードをはがしてバインダーへ貼る\n（薬室バインダー→ホワイトボードへ、廊下バインダー→冷蔵庫側面へ）\n※QRコードのないものはちぎって注文BOXへ',committeeId:'c8',priority:'high',status:'discussed',category:'提案',createdAt:'2026-02-20T10:00:00'},
+    {id:'a29',title:'ピルカッターの院内処方について',detail:'',committeeId:'c9',priority:'medium',status:'discussed',category:'提案',createdAt:'2026-02-20T10:00:00'},
+    {id:'a30',title:'23Gショート針の導入（オンシオール皮下注射用）',detail:'各科で23Gの針の使い方を変更・注意をお願いします',committeeId:'c9',priority:'medium',status:'discussed',category:'提案',createdAt:'2026-02-20T10:00:00'},
+    {id:'a31',title:'外注検査結果の取り扱い統一',detail:'飼い主様にお渡しする1枚を印刷・カルテ差しへ、結果のスキャンで統一',committeeId:'c9',priority:'medium',status:'discussed',category:'お伺い',createdAt:'2026-02-20T10:00:00'},
+    {id:'a32',title:'LINE導入を獣医師以外で行えないか',detail:'内容に関して全体での把握をお願い',committeeId:'c9',priority:'medium',status:'discussed',category:'お伺い',createdAt:'2026-02-20T10:00:00'},
+    {id:'a33',title:'ペットドック結果報告書の改善',detail:'Ahmicsのカルテを印刷してお渡しする案',committeeId:'c9',priority:'low',status:'discussed',category:'提案',createdAt:'2026-02-20T10:00:00'},
+    {id:'a34',title:'パノクエルの導入報告',detail:'1つ導入し、使用について検討する',committeeId:'c9',priority:'low',status:'discussed',category:'報告',createdAt:'2026-02-20T10:00:00'},
+    {id:'a35',title:'Ahmics資料フォルダの記載注意',detail:'紙カルテの廃止に向けて各獣医師は注意して記載',committeeId:'c9',priority:'medium',status:'discussed',category:'報告',createdAt:'2026-02-20T10:00:00'}
+  ];
+  const meetings = [{id:'m1',name:'2月 全体会議',date:'2026-02-23',startTime:'14:00',endTime:'16:00',place:'会議室',agendaIds:agendas.map(a=>a.id),createdAt:'2026-02-15T10:00:00'}];
+  const todos = [
+    {id:'t1',content:'猫用カラー（写真タイプ）を1つ試験購入',assigneeId:'',dueDate:'2026-03-15',committeeId:'c1',priority:'medium',done:false,createdAt:'2026-02-23T16:00:00'},
+    {id:'t2',content:'乳鉢1セット（¥1,296）を購入',assigneeId:'',dueDate:'2026-03-10',committeeId:'c1',priority:'low',done:false,createdAt:'2026-02-23T16:00:00'},
+    {id:'t3',content:'処置室ワゴンにテプラを貼る',assigneeId:'',dueDate:'2026-03-15',committeeId:'c5',priority:'medium',done:false,createdAt:'2026-02-23T16:00:00'},
+    {id:'t4',content:'3月初旬 春の飾り付け実施',assigneeId:'',dueDate:'2026-03-10',committeeId:'c4',priority:'low',done:false,createdAt:'2026-02-23T16:00:00'},
+    {id:'t5',content:'サージロン・バイオシン 3/1残分を破棄',assigneeId:'',dueDate:'2026-03-01',committeeId:'c8',priority:'high',done:false,createdAt:'2026-02-23T16:00:00'},
+    {id:'t6',content:'注文方法をQRコード→バインダーに変更・周知',assigneeId:'',dueDate:'2026-03-15',committeeId:'c8',priority:'high',done:false,createdAt:'2026-02-23T16:00:00'},
+    {id:'t7',content:'フィラリア・ノミマダニ・SFTSセミナーの日程調整',assigneeId:'',dueDate:'2026-03-31',committeeId:'c4',priority:'medium',done:false,createdAt:'2026-02-23T16:00:00'},
+    {id:'t8',content:'新人歓迎会(BBQ)の日程・場所を決定',assigneeId:'',dueDate:'2026-04-15',committeeId:'c6',priority:'medium',done:false,createdAt:'2026-02-23T16:00:00'},
+    {id:'t9',content:'LINEピン留め運用ルールの周知',assigneeId:'',dueDate:'2026-03-10',committeeId:'c7',priority:'high',done:false,createdAt:'2026-02-23T16:00:00'},
+    {id:'t10',content:'紙カルテ廃止のスケジュール確定',assigneeId:'',dueDate:'2026-03-31',committeeId:'c7',priority:'high',done:false,createdAt:'2026-02-23T16:00:00'}
+  ];
+  return {settings:{orgName:'',meetingCycle:2},committees,members:[],agendas,meetings,minutes:{},todos};
+}
+
+// ===== Data Store =====
+const SK='meetingPlatformV5'; let data;
+// 起動時に古いデータを全てクリア
+try{localStorage.removeItem('meetingPlatformV2');localStorage.removeItem('meetingPlatformV3');localStorage.removeItem('meetingPlatformV4');}catch(e){}
+function loadData(){
+  const sample=createSampleData();
+  try{
+    const s=localStorage.getItem(SK);
+    if(s){data=JSON.parse(s);}else{data=sample;}
+  }catch(e){data=sample;}
+  // 委員会データは常にデフォルトで上書き
+  data.committees=sample.committees;
+  if(!data.members)data.members=[];
+  if(!data.agendas)data.agendas=sample.agendas;
+  if(!data.meetings)data.meetings=sample.meetings;
+  if(!data.todos)data.todos=sample.todos;
+  if(!data.settings)data.settings=sample.settings;
+  saveData();
+}
+function saveData(){try{localStorage.setItem(SK,JSON.stringify(data));}catch(e){}}
+function exportData(){const b=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);const d=new Date();a.download=`meeting-backup-${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}.json`;a.click();}
+function importData(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=function(ev){try{if(confirm('現在のデータを上書きしますか？')){data=JSON.parse(ev.target.result);saveData();location.reload();}}catch(err){alert('読み込み失敗');}};r.readAsText(f);e.target.value='';}
+function resetToSample(){if(confirm('サンプルデータ（2月全体会議）に戻しますか？')){data=createSampleData();saveData();location.reload();}}
+
+// ===== Nav =====
+function showPage(p,el){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.getElementById('page-'+p).classList.add('active');document.querySelectorAll('.sidebar-item').forEach(s=>s.classList.remove('active'));if(el)el.classList.add('active');({dashboard:renderDashboard,agenda:()=>{populateAgendaSelects();renderAgendas();},committees:renderCommittees,meetings:renderMeetings,minutes:populateMinutesMeetingSelect,history:renderHistory,todos:renderTodos,members:renderMembers,settings:loadSettings})[p]?.();}
+function openModal(id){document.getElementById(id).classList.add('show');if(id==='meetingModal')populateMeetingAgendaSelect();if(id==='memberModal'){document.getElementById('memberEditId').value='';document.getElementById('memberModalTitle').textContent='メンバーを追加';document.getElementById('memberSubmitBtn').textContent='追加';document.getElementById('memberName').value='';document.getElementById('memberRole').value='獣医師';populateMemberCommitteeSelect();}if(id==='todoModal')populateTodoSelects();}
+function closeModal(id){document.getElementById(id).classList.remove('show');}
+
+// ===== Utils =====
+function esc(s){if(!s)return'';const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
+function formatDate(iso){if(!iso)return'';const d=new Date(iso);return`${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}`;}
+function gc(id){return data.committees.find(c=>c.id===id);}
+function gm(id){return data.members.find(m=>m.id===id);}
+const PL={high:'高',medium:'中',low:'低'},PI={high:'🔴',medium:'🟡',low:'🟢'},CB={'提案':'badge-blue','お伺い':'badge-yellow','報告':'badge-green','お願い':'badge-red','購入希望':'badge-gray','その他':'badge-gray'};
+
+// ===== Committees =====
+function addCommittee(){const n=document.getElementById('committeeName').value.trim();if(!n)return alert('委員会名を入力');data.committees.push({id:'c'+Date.now(),name:n,color:document.getElementById('committeeColor').value,desc:document.getElementById('committeeDesc').value.trim()});saveData();closeModal('committeeModal');document.getElementById('committeeName').value='';document.getElementById('committeeDesc').value='';renderCommittees();}
+function deleteCommittee(id){if(!confirm('削除しますか？'))return;data.committees=data.committees.filter(c=>c.id!==id);saveData();renderCommittees();}
+function renderCommittees(){const el=document.getElementById('committeeList');if(!data.committees.length){el.innerHTML='<div class="empty-state"><div class="icon">🏛️</div><p>委員会未登録</p></div>';return;}el.innerHTML='<table><thead><tr><th></th><th>委員会名</th><th>説明</th><th>議題数</th><th></th></tr></thead><tbody>'+data.committees.map(c=>{const n=data.agendas.filter(a=>a.committeeId===c.id).length;return`<tr><td><span class="committee-dot" style="background:${c.color}"></span></td><td><strong>${esc(c.name)}</strong></td><td style="color:var(--gray-500);font-size:13px">${esc(c.desc||'—')}</td><td>${n}件</td><td><button class="btn btn-sm btn-outline" style="color:var(--danger)" onclick="deleteCommittee('${c.id}')">削除</button></td></tr>`;}).join('')+'</tbody></table>';}
+
+// ===== Members =====
+function saveMember(){const n=document.getElementById('memberName').value.trim();if(!n)return alert('名前を入力');const cs=Array.from(document.querySelectorAll('#memberCommitteeSelect input:checked')).map(x=>x.value);const editId=document.getElementById('memberEditId').value;if(editId){const m=data.members.find(m=>m.id===editId);if(m){m.name=n;m.role=document.getElementById('memberRole').value;m.committees=cs;}}else{data.members.push({id:'m'+Date.now(),name:n,role:document.getElementById('memberRole').value,committees:cs});}saveData();closeModal('memberModal');document.getElementById('memberName').value='';document.getElementById('memberEditId').value='';renderMembers();}
+function editMember(id){const m=data.members.find(x=>x.id===id);if(!m)return;document.getElementById('memberEditId').value=id;document.getElementById('memberModalTitle').textContent='メンバーを編集';document.getElementById('memberSubmitBtn').textContent='保存';populateMemberCommitteeSelect();document.getElementById('memberName').value=m.name;document.getElementById('memberRole').value=m.role||'獣医師';(m.committees||[]).forEach(cid=>{const cb=document.querySelector('#memberCommitteeSelect input[value="'+cid+'"]');if(cb)cb.checked=true;});document.getElementById('memberModal').classList.add('show');}
+function deleteMember(id){if(!confirm('削除？'))return;data.members=data.members.filter(m=>m.id!==id);saveData();renderMembers();}
+function populateMemberCommitteeSelect(){document.getElementById('memberCommitteeSelect').innerHTML=data.committees.map(c=>`<div style="display:flex;align-items:center;gap:8px;padding:6px 0;cursor:pointer" onclick="this.querySelector('input').click()"><input type="checkbox" value="${c.id}" style="width:16px;height:16px;flex-shrink:0"><span style="width:10px;height:10px;border-radius:50%;background:${c.color};flex-shrink:0;display:inline-block"></span><span style="font-size:14px">${esc(c.name)}</span></div>`).join('')||'<p style="color:var(--gray-400);font-size:13px">先に委員会を登録</p>';}
+function renderMembers(){const el=document.getElementById('memberList');if(!data.members.length){el.innerHTML='<div class="empty-state"><div class="icon">👥</div><p>メンバー未登録<br><span style="font-size:13px">スタッフを登録すると、議題投稿やToDo割り当てに使えます</span></p></div>';return;}el.innerHTML='<table><thead><tr><th>名前</th><th>役職</th><th>所属委員会</th><th></th></tr></thead><tbody>'+data.members.map(m=>{const cs=(m.committees||[]).map(cid=>{const c=gc(cid);return c?`<span class="tag"><span class="committee-dot" style="background:${c.color}"></span>${esc(c.name)}</span>`:'';}).join('');return`<tr><td><strong>${esc(m.name)}</strong></td><td>${esc(m.role||'—')}</td><td>${cs||'—'}</td><td style="white-space:nowrap"><button class="btn btn-sm btn-outline" onclick="editMember('${m.id}')">編集</button> <button class="btn btn-sm btn-outline" style="color:var(--danger)" onclick="deleteMember('${m.id}')">削除</button></td></tr>`;}).join('')+'</tbody></table>';}
+
+// ===== Image Helpers =====
+let pendingAgendaImages=[];
+function previewAgendaImages(input){const preview=document.getElementById('agendaImagePreview');preview.innerHTML='';pendingAgendaImages=[];Array.from(input.files).forEach((file,i)=>{compressImage(file,800,0.6).then(dataUrl=>{pendingAgendaImages.push(dataUrl);const div=document.createElement('div');div.style.cssText='position:relative;display:inline-block';div.innerHTML=`<img src="${dataUrl}" style="height:80px;border-radius:6px;border:1px solid var(--gray-200)"><button onclick="removeAgendaPreview(${i},this.parentElement)" style="position:absolute;top:-6px;right:-6px;background:var(--danger);color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:12px;cursor:pointer;line-height:20px">×</button>`;preview.appendChild(div);});});}
+function removeAgendaPreview(idx,el){pendingAgendaImages[idx]=null;el.remove();}
+function compressImage(file,maxW,quality){return new Promise(resolve=>{const reader=new FileReader();reader.onload=e=>{const img=new Image();img.onload=()=>{const canvas=document.createElement('canvas');let w=img.width,h=img.height;if(w>maxW){h=h*(maxW/w);w=maxW;}canvas.width=w;canvas.height=h;canvas.getContext('2d').drawImage(img,0,0,w,h);resolve(canvas.toDataURL('image/jpeg',quality));};img.src=e.target.result;};reader.readAsDataURL(file);});}
+
+// ===== Agendas =====
+function populateAgendaSelects(){document.getElementById('agendaCommittee').innerHTML=data.committees.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('');document.getElementById('agendaAuthor').innerHTML='<option value="">選択してください</option>'+data.members.map(m=>`<option value="${m.id}">${esc(m.name)}</option>`).join('');const tm=document.getElementById('agendaTargetMeeting');const today=new Date();today.setHours(0,0,0,0);const upcoming=[...data.meetings].filter(m=>new Date(m.date+'T23:59:59')>=today).sort((a,b)=>a.date.localeCompare(b.date));tm.innerHTML='<option value="">未定</option>'+upcoming.map(m=>`<option value="${m.id}">${formatDate(m.date)} ${esc(m.name)}</option>`).join('');if(!upcoming.length){tm.innerHTML+='<option disabled>（会議一覧で先に会議を作成してください）</option>';}const fc=document.getElementById('agendaFilterCommittee');if(fc.options.length<=1)data.committees.forEach(c=>{const o=document.createElement('option');o.value=c.id;o.textContent=c.name;fc.appendChild(o);});}
+function addAgenda(){const t=document.getElementById('agendaTitle').value.trim();if(!t)return alert('議題タイトルを入力');const images=pendingAgendaImages.filter(x=>x);const tmId=document.getElementById('agendaTargetMeeting').value;const ag={id:'a'+Date.now(),title:t,detail:document.getElementById('agendaDetail').value.trim(),committeeId:document.getElementById('agendaCommittee').value,authorId:document.getElementById('agendaAuthor').value,priority:document.getElementById('agendaPriority').value,status:'pending',category:document.getElementById('agendaCategory').value,images:images,targetMeetingId:tmId||'',createdAt:new Date().toISOString()};data.agendas.push(ag);if(tmId){const mt=data.meetings.find(m=>m.id===tmId);if(mt){if(!mt.agendaIds)mt.agendaIds=[];if(!mt.agendaIds.includes(ag.id))mt.agendaIds.push(ag.id);}}saveData();document.getElementById('agendaTitle').value='';document.getElementById('agendaDetail').value='';document.getElementById('agendaImage').value='';document.getElementById('agendaImagePreview').innerHTML='';pendingAgendaImages=[];renderAgendas();}
+function deleteAgenda(id){if(!confirm('削除？'))return;data.agendas=data.agendas.filter(a=>a.id!==id);saveData();renderAgendas();}
+function toggleAgendaStatus(id){const a=data.agendas.find(x=>x.id===id);if(a)a.status=a.status==='pending'?'discussed':'pending';saveData();renderAgendas();}
+function showAgendaDetail(id){const a=data.agendas.find(x=>x.id===id);if(!a)return;const c=gc(a.committeeId),au=gm(a.authorId);const imgHtml=(a.images&&a.images.length)?`<div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:8px">${a.images.map(src=>`<img src="${src}" style="max-width:100%;max-height:300px;border-radius:6px;border:1px solid var(--gray-200);cursor:pointer" onclick="window.open(this.src,'_blank')">`).join('')}</div>`:'';document.getElementById('agendaDetailTitle').textContent=a.title;document.getElementById('agendaDetailContent').innerHTML=`<p style="margin-bottom:10px"><span class="badge" style="background:${c?.color}20;color:${c?.color}">${esc(c?.name||'')}</span> <span class="badge ${a.status==='discussed'?'badge-green':'badge-yellow'}">${a.status==='discussed'?'討議済み':'未討議'}</span> <span class="badge ${CB[a.category]||'badge-gray'}">${esc(a.category||'')}</span> <span class="badge ${a.priority==='high'?'badge-red':a.priority==='medium'?'badge-yellow':'badge-gray'}">${PL[a.priority]}</span></p>${au?`<p style="font-size:13px;color:var(--gray-500);margin-bottom:8px">投稿者: ${esc(au.name)}</p>`:''}${a.createdAt?`<p style="font-size:13px;color:var(--gray-500);margin-bottom:8px">投稿日: ${formatDate(a.createdAt)}</p>`:''}${(()=>{const tm=a.targetMeetingId?data.meetings.find(m=>m.id===a.targetMeetingId):null;return tm?`<p style="font-size:13px;color:var(--gray-500);margin-bottom:8px">対象会議: <span class="badge badge-blue">${formatDate(tm.date)} ${esc(tm.name)}</span></p>`:'';})()}<div style="background:var(--gray-50);padding:14px;border-radius:var(--radius);font-size:14px;white-space:pre-wrap;line-height:1.8">${esc(a.detail||'詳細なし')}</div>${imgHtml}`;openModal('agendaDetailModal');}
+function renderAgendas(){const f=document.getElementById('agendaFilter').value,cf=document.getElementById('agendaFilterCommittee').value;let items=[...data.agendas].reverse();if(f!=='all')items=items.filter(a=>a.status===f);if(cf!=='all')items=items.filter(a=>a.committeeId===cf);const el=document.getElementById('agendaList');if(!items.length){el.innerHTML='<div class="empty-state"><div class="icon">📝</div><p>議題がありません</p></div>';return;}el.innerHTML='<table><thead><tr><th>状態</th><th>委員会</th><th>議題</th><th>対象会議</th><th>投稿日</th><th>分類</th><th></th></tr></thead><tbody>'+items.map(a=>{const c=gc(a.committeeId);const tm=a.targetMeetingId?data.meetings.find(m=>m.id===a.targetMeetingId):null;return`<tr style="cursor:pointer" onclick="showAgendaDetail('${a.id}')"><td><span class="badge ${a.status==='discussed'?'badge-green':'badge-yellow'}">${a.status==='discussed'?'済':'未'}</span></td><td><span class="committee-dot" style="background:${c?.color||'#ccc'}"></span><span style="font-size:13px">${esc(c?.name||'')}</span></td><td><strong>${esc(a.title)}</strong>${a.images&&a.images.length?' 📷':''}</td><td style="font-size:12px;white-space:nowrap">${tm?`<span class="badge badge-blue">${esc(tm.name)}</span>`:'<span style="color:var(--gray-400)">—</span>'}</td><td style="font-size:13px;color:var(--gray-500);white-space:nowrap">${formatDate(a.createdAt)}</td><td><span class="badge ${CB[a.category]||'badge-gray'}">${esc(a.category||'')}</span></td><td onclick="event.stopPropagation()"><button class="btn btn-sm btn-outline" onclick="toggleAgendaStatus('${a.id}')">${a.status==='discussed'?'↩':'✓'}</button> <button class="btn btn-sm btn-outline" style="color:var(--danger)" onclick="deleteAgenda('${a.id}')">×</button></td></tr>`;}).join('')+'</tbody></table>';}
+
+// ===== Meetings =====
+function populateMeetingAgendaSelect(){const p=data.agendas.filter(a=>a.status==='pending'),el=document.getElementById('meetingAgendaSelect');if(!p.length){el.innerHTML='<p style="color:var(--gray-400);font-size:13px">未討議の議題がありません</p>';return;}el.innerHTML=p.map(a=>{const c=gc(a.committeeId);return`<label style="display:flex;align-items:center;gap:6px;padding:4px 0"><input type="checkbox" value="${a.id}"><span class="committee-dot" style="background:${c?.color||'#ccc'}"></span>${esc(a.title)}</label>`;}).join('');}
+function addMeeting(){const n=document.getElementById('meetingName').value.trim(),d=document.getElementById('meetingDate').value;if(!n||!d)return alert('会議名と日付を入力');const aids=Array.from(document.querySelectorAll('#meetingAgendaSelect input:checked')).map(x=>x.value);data.meetings.push({id:'m'+Date.now(),name:n,date:d,startTime:document.getElementById('meetingStart').value,endTime:document.getElementById('meetingEnd').value,place:document.getElementById('meetingPlace').value.trim(),agendaIds:aids,createdAt:new Date().toISOString()});saveData();closeModal('meetingModal');document.getElementById('meetingName').value='';document.getElementById('meetingDate').value='';document.getElementById('meetingPlace').value='';renderMeetings();}
+function deleteMeeting(id){if(!confirm('削除？'))return;data.meetings=data.meetings.filter(m=>m.id!==id);delete data.minutes[id];saveData();renderMeetings();}
+function renderMeetings(){const el=document.getElementById('meetingList');if(!data.meetings.length){el.innerHTML='<div class="empty-state"><div class="icon">🗓️</div><p>会議未登録</p></div>';return;}const today=new Date();today.setHours(0,0,0,0);const s=[...data.meetings].sort((a,b)=>a.date.localeCompare(b.date));const upcoming=s.filter(m=>new Date(m.date+'T23:59:59')>=today);const past=s.filter(m=>new Date(m.date+'T23:59:59')<today).reverse();function daysUntil(d){const t=new Date(d);t.setHours(0,0,0,0);const diff=Math.ceil((t-today)/(1000*60*60*24));if(diff===0)return'<span class="badge badge-red">本日</span>';if(diff===1)return'<span class="badge badge-yellow">明日</span>';if(diff<=7)return`<span class="badge badge-blue">${diff}日後</span>`;if(diff<=30)return`<span class="badge badge-gray">${diff}日後</span>`;return`<span class="badge badge-gray">${diff}日後</span>`;}function meetingRow(m,isFuture){const h=!!data.minutes[m.id];return`<tr><td><strong>${formatDate(m.date)}</strong>${isFuture?' '+daysUntil(m.date):''}</td><td>${esc(m.name)}</td><td>${m.startTime||''} - ${m.endTime||''}</td><td>${esc(m.place||'—')}</td><td>${(m.agendaIds||[]).length}件</td><td><span class="badge ${h?'badge-green':'badge-gray'}">${h?'記録済':'未記録'}</span></td><td><button class="btn btn-sm btn-outline" style="color:var(--danger)" onclick="deleteMeeting('${m.id}')">削除</button></td></tr>`;}let html='';if(upcoming.length){html+=`<div style="margin-bottom:8px;padding:8px 12px;background:var(--primary-bg);border-radius:var(--radius);font-weight:600;font-size:14px;color:var(--primary)">📅 今後の会議（${upcoming.length}件）</div><table><thead><tr><th>日付</th><th>会議名</th><th>時間</th><th>場所</th><th>議題数</th><th>議事録</th><th></th></tr></thead><tbody>${upcoming.map(m=>meetingRow(m,true)).join('')}</tbody></table>`;}if(past.length){html+=`<div style="margin:${upcoming.length?'20':'0'}px 0 8px;padding:8px 12px;background:var(--gray-50);border-radius:var(--radius);font-weight:600;font-size:14px;color:var(--gray-500)">📋 過去の会議（${past.length}件）</div><table><thead><tr><th>日付</th><th>会議名</th><th>時間</th><th>場所</th><th>議題数</th><th>議事録</th><th></th></tr></thead><tbody>${past.map(m=>meetingRow(m,false)).join('')}</tbody></table>`;}el.innerHTML=html;}
+
+// ===== Minutes =====
+function populateMinutesMeetingSelect(){const s=document.getElementById('minutesMeetingSelect');s.innerHTML='<option value="">会議を選択</option>'+[...data.meetings].sort((a,b)=>b.date.localeCompare(a.date)).map(m=>`<option value="${m.id}">${m.date} - ${esc(m.name)}</option>`).join('');document.getElementById('minutesEditor').style.display='none';}
+function loadMinutes(){const mid=document.getElementById('minutesMeetingSelect').value,ed=document.getElementById('minutesEditor');if(!mid){ed.style.display='none';return;}ed.style.display='block';const mt=data.meetings.find(m=>m.id===mid),sv=data.minutes[mid]||{};document.getElementById('minutesAttendees').innerHTML=data.members.length?data.members.map(m=>`<label style="display:flex;align-items:center;gap:4px;padding:4px 8px;background:var(--gray-50);border-radius:4px;font-size:13px"><input type="checkbox" class="ma" value="${m.id}" ${(sv.attendees||[]).includes(m.id)?'checked':''}>${esc(m.name)}</label>`).join(''):'<p style="color:var(--gray-400);font-size:13px">メンバーを登録すると出席者チェックができます</p>';const aids=mt.agendaIds||[],gr={};aids.forEach(aid=>{const ag=data.agendas.find(a=>a.id===aid);if(!ag)return;if(!gr[ag.committeeId])gr[ag.committeeId]=[];gr[ag.committeeId].push(ag);});let h='';data.committees.forEach(c=>{if(!gr[c.id])return;h+=`<div style="margin-bottom:16px"><h4 style="margin-bottom:8px"><span class="committee-dot" style="background:${c.color}"></span>${esc(c.name)}</h4>`;gr[c.id].forEach(ag=>{const n=sv.agendaNotes?.[ag.id]||'',d=sv.agendaDecisions?.[ag.id]||'';h+=`<div class="minutes-agenda-card" style="border-left-color:${c.color}"><div style="font-weight:600;font-size:14px;margin-bottom:8px">${esc(ag.title)}</div><div class="form-group"><label>討議内容</label><textarea class="mn" data-agenda="${ag.id}" rows="2">${esc(n)}</textarea></div><div class="form-group"><label>決定事項</label><textarea class="md" data-agenda="${ag.id}" rows="2">${esc(d)}</textarea></div></div>`;});h+='</div>';});document.getElementById('minutesAgendaItems').innerHTML=h||'<p style="color:var(--gray-400)">議題なし</p>';document.getElementById('minutesGeneralNotes').value=sv.generalNotes||'';}
+function saveMinutes(){const mid=document.getElementById('minutesMeetingSelect').value;if(!mid)return;const at=Array.from(document.querySelectorAll('.ma:checked')).map(x=>x.value),an={},ad={};document.querySelectorAll('.mn').forEach(t=>{an[t.dataset.agenda]=t.value;});document.querySelectorAll('.md').forEach(t=>{ad[t.dataset.agenda]=t.value;});data.minutes[mid]={attendees:at,agendaNotes:an,agendaDecisions:ad,generalNotes:document.getElementById('minutesGeneralNotes').value,savedAt:new Date().toISOString()};const mt=data.meetings.find(m=>m.id===mid);if(mt)(mt.agendaIds||[]).forEach(aid=>{const ag=data.agendas.find(a=>a.id===aid);if(ag)ag.status='discussed';});saveData();alert('議事録を保存しました');}
+
+// ===== History =====
+function renderHistory(){const f=document.getElementById('historyFilter').value,v=document.getElementById('historyView').value,fs=document.getElementById('historyFilter');if(fs.options.length<=1)data.committees.forEach(c=>{const o=document.createElement('option');o.value=c.id;o.textContent=c.name;fs.appendChild(o);});const el=document.getElementById('historyContent'),sorted=[...data.meetings].sort((a,b)=>b.date.localeCompare(a.date));if(!sorted.length){el.innerHTML='<div class="empty-state"><div class="icon">📊</div><p>会議記録なし</p></div>';return;}v==='committee'?renderHistoryByCommittee(el,f,sorted):renderHistoryTimeline(el,f,sorted);}
+function renderHistoryTimeline(el,f,sorted){let h='<div class="timeline">';sorted.forEach(m=>{const mins=data.minutes[m.id];let ag=(m.agendaIds||[]).map(aid=>data.agendas.find(a=>a.id===aid)).filter(Boolean);if(f!=='all')ag=ag.filter(a=>a.committeeId===f);if(f!=='all'&&!ag.length)return;h+=`<div class="timeline-item"><div class="timeline-date">${m.date} — ${esc(m.name)}</div><div class="timeline-content">`;const gr={};ag.forEach(a=>{if(!gr[a.committeeId])gr[a.committeeId]=[];gr[a.committeeId].push(a);});data.committees.forEach(c=>{if(!gr[c.id])return;h+=`<div style="margin-bottom:10px"><div style="font-weight:600;font-size:13px;margin-bottom:6px"><span class="committee-dot" style="background:${c.color}"></span>${esc(c.name)}</div>`;gr[c.id].forEach(a=>{h+=`<div style="padding:4px 0 4px 16px;border-bottom:1px solid var(--gray-100);font-size:13px"><div style="font-weight:500">${esc(a.title)}</div>`;if(mins?.agendaNotes?.[a.id])h+=`<div style="color:var(--gray-500);margin-top:2px">${esc(mins.agendaNotes[a.id])}</div>`;if(mins?.agendaDecisions?.[a.id])h+=`<div style="color:var(--success);margin-top:2px">✅ ${esc(mins.agendaDecisions[a.id])}</div>`;h+='</div>';});h+='</div>';});if(mins?.generalNotes)h+=`<div style="font-size:13px;color:var(--gray-500);margin-top:8px;padding-top:8px;border-top:1px solid var(--gray-200)"><strong>全体メモ:</strong> ${esc(mins.generalNotes)}</div>`;h+='</div></div>';});h+='</div>';el.innerHTML=h;}
+function renderHistoryByCommittee(el,f,sorted){const cs=f!=='all'?data.committees.filter(c=>c.id===f):data.committees;let h='';cs.forEach(c=>{h+=`<div class="committee-card" style="border-left-color:${c.color}"><h4><span class="committee-dot" style="background:${c.color}"></span>${esc(c.name)}</h4>`;sorted.forEach(m=>{const ag=(m.agendaIds||[]).map(aid=>data.agendas.find(a=>a.id===aid)).filter(a=>a&&a.committeeId===c.id);if(!ag.length)return;const mins=data.minutes[m.id];h+=`<div style="margin-top:10px"><div style="font-size:12px;color:var(--gray-400);font-weight:600">${m.date}</div>`;ag.forEach(a=>{h+=`<div style="padding:4px 0;font-size:13px;border-bottom:1px solid var(--gray-100)"><strong>${esc(a.title)}</strong>`;if(mins?.agendaDecisions?.[a.id])h+=`<br><span style="color:var(--success)">✅ ${esc(mins.agendaDecisions[a.id])}</span>`;h+='</div>';});h+='</div>';});h+='</div>';});el.innerHTML=h||'<div class="empty-state"><p>該当なし</p></div>';}
+
+// ===== Todos =====
+let tf='all';
+function populateTodoSelects(){document.getElementById('todoAssignee').innerHTML='<option value="">未割り当て</option>'+data.members.map(m=>`<option value="${m.id}">${esc(m.name)}</option>`).join('');document.getElementById('todoCommittee').innerHTML='<option value="">なし</option>'+data.committees.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('');}
+function addTodo(){const ct=document.getElementById('todoContent').value.trim();if(!ct)return alert('タスク内容を入力');data.todos.push({id:'t'+Date.now(),content:ct,assigneeId:document.getElementById('todoAssignee').value,dueDate:document.getElementById('todoDueDate').value,committeeId:document.getElementById('todoCommittee').value,priority:document.getElementById('todoPriority').value,done:false,createdAt:new Date().toISOString()});saveData();closeModal('todoModal');document.getElementById('todoContent').value='';renderTodos();}
+function toggleTodo(id){const t=data.todos.find(x=>x.id===id);if(t)t.done=!t.done;saveData();renderTodos();}
+function deleteTodo(id){data.todos=data.todos.filter(t=>t.id!==id);saveData();renderTodos();}
+function filterTodos(f,el){tf=f;document.querySelectorAll('#page-todos .tab').forEach(t=>t.classList.remove('active'));if(el)el.classList.add('active');renderTodos();}
+function renderTodos(){const el=document.getElementById('todoList'),td=new Date().toISOString().split('T')[0];let items=[...data.todos];if(tf==='pending')items=items.filter(t=>!t.done);else if(tf==='done')items=items.filter(t=>t.done);else if(tf==='overdue')items=items.filter(t=>!t.done&&t.dueDate&&t.dueDate<td);if(!items.length){el.innerHTML='<div class="empty-state"><div class="icon">✅</div><p>タスクなし</p></div>';return;}el.innerHTML=items.map(t=>{const as=gm(t.assigneeId),c=gc(t.committeeId),ov=!t.done&&t.dueDate&&t.dueDate<td;return`<div class="todo-item"><input type="checkbox" class="todo-checkbox" ${t.done?'checked':''} onchange="toggleTodo('${t.id}')"><div style="flex:1"><div class="todo-text ${t.done?'done':''}">${PI[t.priority]||''} ${esc(t.content)}</div><div class="todo-meta">${as?`<span>👤 ${esc(as.name)}</span>`:''} ${c?`<span><span class="committee-dot" style="background:${c.color}"></span>${esc(c.name)}</span>`:''} ${t.dueDate?`<span style="${ov?'color:var(--danger);font-weight:600':''}">📅 ${t.dueDate}${ov?' ⚠️':''}</span>`:''}</div></div><button class="btn btn-sm btn-outline" style="color:var(--danger)" onclick="deleteTodo('${t.id}')">×</button></div>`;}).join('');}
+
+// ===== Dashboard =====
+function renderDashboard(){const td=new Date().toISOString().split('T')[0],pa=data.agendas.filter(a=>a.status==='pending').length,pt=data.todos.filter(t=>!t.done).length,ot=data.todos.filter(t=>!t.done&&t.dueDate&&t.dueDate<td).length,tm=data.meetings.length;document.getElementById('dashboardStats').innerHTML=`<div class="stat-card"><div class="stat-value">${pa}</div><div class="stat-label">未討議の議題</div></div><div class="stat-card"><div class="stat-value">${pt}</div><div class="stat-label">未完了のToDo</div></div><div class="stat-card"><div class="stat-value" style="${ot?'color:var(--danger)':''}">${ot}</div><div class="stat-label">期限超過タスク</div></div><div class="stat-card"><div class="stat-value">${tm}</div><div class="stat-label">会議回数（累計）</div></div>`;const rc=data.agendas.filter(a=>a.status==='pending').slice(-5).reverse();document.getElementById('recentAgendas').innerHTML=rc.length?rc.map(a=>{const c=gc(a.committeeId);return`<div style="padding:8px 0;border-bottom:1px solid var(--gray-100);cursor:pointer" onclick="showAgendaDetail('${a.id}')"><span class="committee-dot" style="background:${c?.color||'#ccc'}"></span><span style="font-size:13px">${esc(a.title)}</span></div>`;}).join(''):'<p style="color:var(--gray-400);font-size:13px;padding:12px 0">未討議の議題はありません</p>';const rt=data.todos.filter(t=>!t.done).slice(0,5);document.getElementById('recentTodos').innerHTML=rt.length?rt.map(t=>{const ov=t.dueDate&&t.dueDate<td;return`<div class="todo-item" style="padding:6px 0"><input type="checkbox" class="todo-checkbox" onchange="toggleTodo('${t.id}')"><span style="flex:1;font-size:13px">${esc(t.content)}</span>${t.dueDate?`<span style="font-size:11px;${ov?'color:var(--danger)':'color:var(--gray-400)'}">${t.dueDate}</span>`:''}</div>`;}).join(''):'<p style="color:var(--gray-400);font-size:13px;padding:12px 0">未完了のToDoなし</p>';}
+
+// ===== Settings =====
+function loadSettings(){document.getElementById('orgName').value=data.settings.orgName||'';document.getElementById('meetingCycle').value=data.settings.meetingCycle||2;}
+function saveSettings(){data.settings.orgName=document.getElementById('orgName').value;data.settings.meetingCycle=parseInt(document.getElementById('meetingCycle').value);saveData();}
+function exportData(){const json=JSON.stringify(data,null,2);const blob=new Blob([json],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='meeting-data-export.json';a.click();URL.revokeObjectURL(a.href);alert('エクスポートが完了しました。保存先を「社内会議用資料」フォルダに指定してください。');}
+
+// ===== Init =====
+loadData();renderDashboard();
+document.querySelectorAll('.modal-overlay').forEach(o=>{o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('show');});});
+</script>
+</body>
+</html>
